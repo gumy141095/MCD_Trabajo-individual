@@ -161,3 +161,4 @@ La formula anterior representaria los pesos de cada conexion multiplicado por el
 - Wikipedia contributors. (2023). Red neuronal artificial. In Wikipedia, The Free Encyclopedia. Recuperado el 09/06/2023 desde https://es.wikipedia.org/wiki/Red_neuronal_artificial
 - Ahlawat S, Choudhary A, Nayyar A, Singh S, Yoon B. Improved Handwritten Digit Recognition Using Convolutional Neural Networks (CNN). Sensors. 2020; 20(12):3344. https://doi.org/10.3390/s20123344
 - TensorFlow. (2023). MNIST dataset. Recuperado de: [Dataset de Tensorflow](https://www.tensorflow.org/datasets/catalog/mnist)
+- Towards Data Science. (2019). Gentle Dive into Math Behind Convolutional Neural Networks. Recuperado de [https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9]
