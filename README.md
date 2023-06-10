@@ -72,17 +72,25 @@ Y por último dicho resultado se propaga a la salida (pasando en muchos casos an
 Una función de activación es una función que transmite la información generada por la combinación lineal de los pesos y las entradas, es decir son la manera de transmitir la información por las conexiones de salida. La información puede transmitirse sin modificaciones, estaríamos hablando de una función identidad, o bien que no transmita la información. Como lo que queremos es que la red sea capaz de resolver problemas cada vez más complejos, las funciones de activación generalmente harán que los modelos sean no lineales. Entre las funciones de activación más conocidas o más usadas se encuentran:
 
 * Función Escalón, (similar a la función binaria.)
+```math
 $$ \phi(x)=
 \begin{cases}
   0\text{ si }x<0\\    
   1\text{ si }x\ge0 
 \end{cases} $$
+```
 * Función Sigmoidal.
+```math
 $$ \phi(x)=\frac{1}{1+e^{-x}}$$
+```
 * Función Rectificadora (ReLU).
+```math
 $$ \phi(x)= max\{0,x\},\text{ siendo } x \ge 0$$
+```
 * Función Tangente Hiperbólica.
+```math
 $$ \phi(x)= \frac{1-e^{-2x}}{1+e^{-2x}}$$
+```
 
 * Funciones de Base Radial. (Gausianas, multicuadráticas, multicuadráticas inversas…)
 
@@ -101,7 +109,53 @@ La capa convolucional es la primera capa colocada encima de la imagen de entrada
 
 La computación de las CNN está inspirada en la corteza visual de los animales. La corteza visual es una parte del cerebro que procesa la información transmitida desde la retina. Procesa información visual y es sensible a pequeñas subregiones de la entrada. De manera similar, se calcula un campo receptivo en una CNN, que es una pequeña región de una imagen de entrada que puede afectar a una región específica de la red. También es uno de los parámetros de diseño importantes de la arquitectura de la CNN y ayuda a establecer otros parámetros de la CNN. Tiene el mismo tamaño que el núcleo y funciona de manera similar a la visión foveal del ojo humano para producir una visión central nítida. El campo receptivo se ve influenciado por el paso, el agrupamiento, el tamaño del núcleo y la profundidad de la CNN. Campo receptivo (r), campo receptivo efectivo (ERF) y campo proyectivo (PF) son términos utilizados para calcular subregiones efectivas en una red. El área de la imagen original que influye en la activación de una neurona se describe utilizando el ERF, mientras que el PF es un recuento de neuronas a las que las neuronas proyectan sus salidas. El paso es otro parámetro utilizado en la arquitectura de la CNN. Se define como el tamaño del paso con el que se desplaza el filtro cada vez. Un valor de paso de 1 indica que el filtro se desliza píxel a píxel. Un tamaño de paso más grande muestra menos superposición entre las celdas. 
 
+La convolución del kernel no solo se utiliza en las CNN, sino que también es un elemento clave de muchos otros algoritmos de Visión por Computadora. Es un proceso en el que tomamos una pequeña matriz de números (llamada kernel o filtro), la pasamos sobre nuestra imagen y la transformamos en función de los valores del filtro. Los valores subsiguientes del mapa de características se calculan según la siguiente fórmula, donde la imagen de entrada se denota como f y nuestro kernel como h. Los índices de las filas y columnas de la matriz de resultados se marcan con m y n respectivamente.
+```math
+G[m,n]=(f*h)[m,n]= \sum_j \sum_k h[j,k]f[m-j,n-k]
+```
+Después de colocar nuestro filtro sobre un píxel seleccionado, tomamos cada valor del kernel y los multiplicamos en pares con los valores correspondientes de la imagen. Finalmente, sumamos todo y colocamos el resultado en el lugar correcto del mapa de características de salida.
 
+Cuando realizamos la convolución sobre la imagen de 6x6 con un kernel de 3x3, obtenemos un mapa de características de 4x4. Esto se debe a que solo hay 16 posiciones únicas donde podemos colocar nuestro filtro dentro de esta imagen. Dado que nuestra imagen se reduce cada vez que realizamos una convolución, solo podemos hacerlo un número limitado de veces antes de que nuestra imagen desaparezca por completo. Además, si observamos cómo se mueve nuestro kernel a través de la imagen, vemos que el impacto de los píxeles ubicados en los bordes es mucho menor que aquellos en el centro de la imagen. De esta manera, perdemos parte de la información contenida en la imagen.
+
+Esta metodología es casi idéntica a la usada para las redes neuronales densamente conectadas, la única diferencia es que en lugar de utilizar una multiplicación de matrices simple, aqui utilizaremos la convolución. La propagación hacia adelante consta de dos pasos. El primero es calcular el valor intermedio Z, que se obtiene como resultado de la convolución de los datos de entrada de la capa anterior con el tensor W (que contiene los filtros) y luego agregar el sesgo b. El segundo paso es la aplicación de una función de activación no lineal a nuestro valor intermedio (nuestra activación se denota por g).
+
+```math
+Z^{[l]}=W^{[l]} \cdot A^{[l-1]} + b^{[l]}
+```
+```math
+A^{[l]}=g^{[l]}(Z^{[l]})
+```
+
+En nuestros cálculos utilizaremos la regla de la cadena. Queremos evaluar la influencia del cambio en los parámetros en el mapa de características resultante y posteriormente en el resultado final. Para laa notación matemática que utilizaremos para facilitar la comprension, abandonaremos la notación completa de la derivada parcial a favor de la notación abreviada que se muestra a continuación. Pero tomando en cuenta que cuando se use esta notación, siempre nos referiremos a la derivada parcial de la función de costo.
+
+```math
+dA^{[l]}= \frac{\partial L}{\partial A^{[l]}},
+dZ^{[l]}= \frac{\partial L}{\partial Z^{[l]}},
+dW^{[l]}= \frac{\partial L}{\partial W^{[l]}},
+db^{[l]}= \frac{\partial L}{\partial b^{[l]}}
+```
+Nuestra tarea es calcular $dW^{[l]}$ y $db^{[l]}$, que son las derivadas asociadas a los parámetros de la capa actual, así como el valor de $dA^{[l-1]}$, que se pasará a la capa anterior. Recibimos $dA^{[l]}$ como entrada. Por supuesto, las dimensiones de los tensores $dW$ y $W$, $db$ y $b$, así como $dA$ y $A$, respectivamente, son las mismas. El primer paso es obtener el valor intermedio $dZ^{[l]}$ aplicando la derivada de nuestra función de activación a nuestro tensor de entrada. Según la regla de la cadena, el resultado de esta operación se utilizará más adelante.
+
+```math
+dZ^{[l]}=dA^{[l]}*g'(dZ^{[l]})
+```
+
+Ahora, debemos ocuparnos de la propagación hacia atrás de la convolución en sí, y para lograr este objetivo utilizaremos una operación de matriz llamada convolución completa. Tenga en cuenta que durante este proceso utilizamos el kernel, que previamente hemos rotado 180 grados. Esta operación puede describirse mediante la siguiente fórmula, donde el filtro se denota por $W$ y $dZ[m, n]$ es un escalar que pertenece a una derivada parcial obtenida de la capa anterior.
+
+```math
+dA+=\sum_{m=0}^{n_h} \sum_{n=0}^{n_w} W \cdot dZ[m, n]
+```
+
+Además de las capas de convolución, las CNNs a menudo utilizan capas de agrupación, también conocidas como capas de pooling. Se utilizan principalmente para reducir el tamaño del tensor y acelerar los cálculos. Estas capas son simples: dividimos nuestra imagen en diferentes regiones y luego realizamos alguna operación para cada una de esas partes. Por ejemplo, en la capa de agrupación máxima (Max Pool Layer), seleccionamos el valor máximo de cada región y lo colocamos en el lugar correspondiente en la salida. Al igual que en el caso de la capa de convolución, tenemos disponibles dos hiperparámetros: el tamaño del filtro y el stride.
+
+![capa de agrupacion](https://miro.medium.com/v2/resize:fit:4800/1*qImgD2KGZw7ETjw3mOxNyg.gif)
+
+Habiendo hecho uso de las capas explicadas para extraer elementos importantes en nuestras imagenes, se seguira con una capa densa que es la que se encargara de aprender los patrones generados por las capas anteriores y conectar con la capa de salida que se encargara de clasificar los resultados. Dicha capa se explico un poco anteriormente en el esquema general y de ahi tenemos la siguiente formula:
+
+```math
+X*W^t=(x_1,x_2,...,x_n)*\begin{pmatrix}w_1\\w_2\\ \vdots \\w_n\end{pmatrix} = \sum_{i=1}x_i*w_i 
+```
+La formula anterior representaria los pesos de cada conexion multiplicado por el valor proporcionado por cada neurona y sumado para despues agregarsele el sesgo de la siguiente neurona y pasar dicho resultado por la funcion de activacion y asi transmitir el valor obtenido a la siguiente capa, que en este caso sera la capa de salida.
 
 ## Referencias
 - Wikipedia contributors. (2023). Red neuronal artificial. In Wikipedia, The Free Encyclopedia. Recuperado el 09/06/2023 desde https://es.wikipedia.org/wiki/Red_neuronal_artificial
