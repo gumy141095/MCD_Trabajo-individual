@@ -51,7 +51,9 @@ En general, una red neuronal esta conformada por una capa de entrada, una capa d
 
 Las señales de entrada, la información que recibe nuestra red neuronal, son variables independientes. Los n-valores de entrada son multiplicados por sus respectivos pesos, es decir en la sinopsis el vector entrada  es multiplicado por el vector peso , dando como resultado una combinación lineal de las entradas y los pesos, algo que denominamos función de ponderación.
 
-$X*W^t=(x_1,x_2,...,x_n)*\begin{pmatrix}w_1\\w_2\\ \vdots \\w_n\end{pmatrix} = \sum_{i=1}x_i*w_i $
+```math
+X*W^t=(x_1,x_2,...,x_n)*\begin{pmatrix}w_1\\w_2\\ \vdots \\w_n\end{pmatrix} = \sum_{i=1}x_i*w_i 
+```
 
 con:
 
